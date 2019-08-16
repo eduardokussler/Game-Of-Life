@@ -1,3 +1,6 @@
+//function to create a 2d array
+//this function is identical to the one that Daniel used in his video
+
 function make2dArray(cols, rows){
 	let arr = new Array(cols);
 	for(let i = 0; i < arr.length; i++){
@@ -7,24 +10,27 @@ function make2dArray(cols, rows){
 	return arr;
 
 }
+//width and height of each square
 var res = 20;
+//array that stores the information of the cells
 var grid;
+//number os columns
 var cols;
+//number of rows
 var rows;
-var ready;
+//boolean variable that states if the animation is running or paused
+var paused;
+
 
 function setup() {
 	createCanvas(1600, 800);
-	//let array = make2dArray(4, 6);
-	//console.log(array);
-	//console.table(grid);
 	frameRate(60);
 	cols = width / res;
 	rows = height / res;
 	grid = make2dArray(cols, rows);
-	ready = false;
+	paused = true;
 	background(0);
-	
+	//initializing the grid
 	for (let i = 0; i < cols; i++) {
 		for (let j = 0; j < rows; j++) {
 		  grid[i][j] = 0;
@@ -36,9 +42,8 @@ function setup() {
 
 
 function displayGrid(grid){
-
-	fill(255);
-	for(let i = 0; i < grid.length; i++){
+	fill(255); //change the fill to white
+	for(let i = 0; i < grid.length; i++){ //looping through the 2d array
 		for(let j = 0; j < grid[i].length; j++){
 			if(grid[i][j] == 1){
 				rect(i*res, j*res, res, res);
@@ -47,9 +52,11 @@ function displayGrid(grid){
 	}
 }
 
+//funcition to count how many cells are alive relative to some point in the array
 function countAliveNeighbours(x, y, table){
 	let alive = 0;
-	
+	//loop through the grid and add the value of each cell
+	//1 means the cell is alive and 0 that it is dead
   	for (let i = -1; i < 2; i++) {
     	for (let j = -1; j < 2; j++) {
       		let col = (x + i + cols) % cols;
@@ -57,12 +64,14 @@ function countAliveNeighbours(x, y, table){
       		alive += table[col][row];
     	}
   	}
-	alive -= table[x][ y];
+	alive -= table[x][y]; //if the center cell was one, subtracts itself 
+	//from the count since it wasn't meant to be considered in the sum
 	return alive;
 }
 	
 
-
+//implements the rules of the Game of Life
+//https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
 function updateGrid(next){
 	let aliveNeighbours = 0;
 	for(let i = 0; i < next.length; i++){
@@ -84,6 +93,7 @@ function updateGrid(next){
 	return next;
 
 }
+//function to set some cell's value to 1, that is, bring some cell to life
 function bringLife(tabela){
 	if(mouseIsPressed){
 		tabela[(int) (mouseX / res)][(int) (mouseY / res)] = 1;
@@ -92,15 +102,15 @@ function bringLife(tabela){
 	return tabela;
 }
 
+//main loop
 function draw() {
-	if(ready){
+	if(!paused){
 		background(0);
 		displayGrid(grid);
 		grid = updateGrid(grid);
 		if(keyIsPressed){
-			ready = false;
+			paused = true;
 		}
-		//console.log("dale");
 	} else {
 		background(0);
 		frameRate(60);
@@ -108,9 +118,8 @@ function draw() {
 		displayGrid(grid);
 		if(keyIsPressed){
 			console.log("Que os jogos comecem");
-			//console.table(grid);
 			frameRate(10);
-			ready = true;
+			paused = false;
 		}
 	}
 }
